@@ -6,8 +6,9 @@ Cycling apps and tools.  These are a new class of applications that run in the b
 ## [![PointsRaceWebIcon](images/graphic2.png) Points Race Web (click here)](https://raw.githack.com/esitarski/CyclingApps/main/points_race_web.html)
 
 An browser-based app to score __Points, Madison, Tempo and Scratch__ races.
-Makes scoring races easy, accurate and fun.
+
+Score races easily, accurately and have fun!
 
 Runs on any device including Tablets, Mobile Phones, Laptops and Desktops.
 
-After stating the app, press __Show Help__ for details.
+After clicking on the link above, press __Show Help__ for details.
