@@ -3,7 +3,7 @@ Cycling apps and tools.  These are a new class of applications that run in the b
 
 # Track Cycling
 
-## [![PointsRaceWebIcon](images/graphic2.png) Points Race Web (click here)](https://raw.githack.com/esitarski/CyclingApps/main/points_race_web.html)
+## [![PointsRaceWebIcon](images/graphic.png) Points Race Web (click here)](https://raw.githack.com/esitarski/CyclingApps/main/points_race_web.html)
 
 An browser-based app to score __Points, Madison, Tempo and Scratch__ races.
 
