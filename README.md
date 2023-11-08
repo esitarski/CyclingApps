@@ -1,5 +1,5 @@
 # CyclingApps
-Cycling apps and tools.
+Cycling apps and tools.  These are a new class of applications that run in the browser only.  They are zero-install.
 
 # Track Cycling
 
