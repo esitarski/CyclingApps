@@ -1,7 +1,7 @@
 # CyclingApps
 Cycling apps and tools.
 
-## ![Screenshot](images/graphic2.png) [Points Race Web](https://raw.githack.com/esitarski/CyclingApps/main/points_race_web.html)
+## [![PointsRaceWebIcon](images/graphic2.png) Points Race Web](https://raw.githack.com/esitarski/CyclingApps/main/points_race_web.html)
 
 An browser-based app to score Points, Madison, Tempo and Scratch races.
 
