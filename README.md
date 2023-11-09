@@ -1,14 +1,19 @@
 # CyclingApps
-Cycling apps and tools.  These are a new class of applications that run in the browser only.  They are zero-install.
+Cycling apps and tools of officials.  These are a new type of applications that run in the browser and read/write local .csv files.  Zero-install.
 
 # Track Cycling
 
 ## [![PointsRaceWebIcon](images/graphic.png) Points Race Web (click here)](https://raw.githack.com/esitarski/CyclingApps/main/points_race_web.html)
 
-An browser-based app to score __Points, Madison, Tempo and Scratch__ races.
+A browser-based app to score __Points, Madison, Tempo and Scratch__ races.
 
-Score races easily, accurately and have fun!
+Score races easily and perfectly.  Removes stress and tedium.  Superior to paper.  Have fun!
 
-Runs in a browser on __any__ device including Tablets, Mobile Phones, Laptops and Desktops, iOS, Android, Windows, MacOS or Linux.
+Runs in a browser on __any__ device including Tablets, Laptops, Mobile Phones and Desktops on iOS, Android, Windows, MacOS or Linux
+(a mobile phone screen may be too small - try it ahead of time).
 
-After clicking on the link above, press __Show Help__ for details.
+Does not require access to the internet (web page can be downloaded ahead of time).  Does not access the internet while running.
+
+Import starting points for Omnium.  Output .csv files for the results for publishing.
+
+Click on the link above.  After the page opens, press __Show Help__ for details.
