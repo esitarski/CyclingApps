@@ -5,14 +5,14 @@ Cycling apps and tools of officials.  These are a new type of applications that 
 
 ## [![PointsRaceWebIcon](images/graphic.png) Points Race Web (click here)](https://raw.githack.com/esitarski/CyclingApps/main/points_race_web.html)
 
-A browser-based app to score __Points, Madison, Tempo and Scratch__ races.
+A browser-based app to score __Points, Madison, Tempo, Scratch and Snowball__ races.
 
-Score races easily and perfectly.  Removes stress and tedium.  Superior to paper.  Have fun!
+Score races easily and perfectly.  Vastly superior to a paper scoring sheet.  Removes stress and tedium.  Have fun!
 
 Runs in a browser on __any__ device including Tablets, Laptops, Mobile Phones and Desktops on iOS, Android, Windows, MacOS or Linux
 (a mobile phone screen may be too small - try it ahead of time).
 
-Does not require access to the internet (web page can be downloaded ahead of time).  Does not access the internet while running.
+Does not require access to the internet (web page can be downloaded ahead of time and loaded from an html file).  Does not access the internet while running.
 
 Import starting points for Omnium.  Output .csv files for the results for publishing.
 
