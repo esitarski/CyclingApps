@@ -451,11 +451,10 @@ class Action {
           if( bibs[i] < 0 )
             finishOrder[i] = finishOrder[i-1];
         }
-
-        ++e.sprintCount;
         
         // Assign points for the sprint.  Account for ties.
-        let points = e.getPointsForPlace( e.sprintCount );
+        ++e.sprintCount;
+        let points = e.getPointsForPlace();
         for( let i = 0, j = 0; i < points.length && i < finishOrder.length; ++i ) {
           let place = i + 1;
           for( ; j < finishOrder.length && finishOrder[j] == place; ++j ) {
@@ -563,6 +562,7 @@ class Event {
   }
 
   getPointsForPlace( sprintCount ) {
+	sprintCount = sprintCount || this.sprintCount;
 	switch( this.eventType ) {
 		case EventType.snowball:
 			return [sprintCount];
