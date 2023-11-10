@@ -511,11 +511,12 @@ class Action {
 
 var EventType = new Enum (
   'points',
+  'madison',
   'tempo',
   'scratch',
-  'snowball',
+  'snowball'
  );
-var EventUsesPoints = new Set( [EventType.points, EventType.tempo, EventType.snowball] );
+var EventUsesPoints = new Set( [EventType.points, EventType.madison, EventType.tempo, EventType.snowball] );
 
 class Event {
   constructor() {
@@ -584,6 +585,7 @@ class Event {
   setParameters() {
     switch( this.eventType ) {
       case EventType.points:
+      case EventType.madison:
         this.pointsForPlace = [5,3,2,1];
         this.pointsForUpDown = 20;
         this.doublePointsLastSprint = true;
@@ -609,6 +611,7 @@ class Event {
   getCmpRank() {
     switch( this.eventType ) {
       case EventType.points:
+      case EventType.madison:
       case EventType.snowball:
         return (a, b) => a.cmpPoints(b);
       case EventType.tempo:
@@ -621,6 +624,7 @@ class Event {
   getCmpEq() {
       switch( this.eventType ) {
         case EventType.points:
+        case EventType.madison:
         case EventType.snowball:
           return (a, b) => a.eqPoints(b);
         case EventType.tempo:
