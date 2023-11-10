@@ -43,6 +43,10 @@ td {
   vertical-align: top;
 }
 
+#idActions {
+	border-right: 3px solid black;
+}
+
 .hover-rows tr:hover {
 	background-color: #DCDCDC;
 }
@@ -251,7 +255,7 @@ button.round {
 
 "use strict";
 
-const version = "PointsRaceWeb 1.0";
+const version = "PointsRaceWeb 1.1";
 
 Array.prototype.clear = function() {
    this.splice(0, Infinity);
@@ -509,8 +513,10 @@ class Action {
 var EventType = new Enum (
   'points',
   'tempo',
-  'scratch'
+  'scratch',
+  'snowball',
  );
+var EventUsesPoints = new Set( [EventType.points, EventType.tempo, EventType.snowball] );
 
 class Event {
   constructor() {
@@ -545,7 +551,7 @@ class Event {
   }
 
   get usesPoints() {
-    return this.eventType == EventType.points || this.eventType == EventType.tempo;
+	  return EventUsesPoints.has(this.eventType);
   }
 
   getRider( bib ) {
@@ -557,10 +563,15 @@ class Event {
   }
 
   getPointsForPlace( sprintCount ) {
-    return (this.doublePointsLastSprint && this.sprintCount === this.sprintMax
-	  ? this.pointsForPlace.map( (x) => x * 2 )
-      : this.pointsForPlace
-     );
+	switch( this.eventType ) {
+		case EventType.snowball:
+			return [sprintCount];
+		default:
+			return (this.doublePointsLastSprint && sprintCount === this.sprintMax
+			  ? this.pointsForPlace.map( (x) => x * 2 )
+			  : this.pointsForPlace
+			 );
+	}
   }
 
   getPulled() {
@@ -587,12 +598,18 @@ class Event {
         this.pointsForUpDown = 0;
         this.doublePointsLastSprint = false;
         break;
+      case EventType.snowball:
+        this.pointsForPlace = [];
+        this.pointsForUpDown = 20;
+        this.doublePointsLastSprint = false;
+        break;
     }
   }
 
   getCmpRank() {
     switch( this.eventType ) {
       case EventType.points:
+      case EventType.snowball:
         return (a, b) => a.cmpPoints(b);
       case EventType.tempo:
         return (a, b) => a.cmpTempo(b);
@@ -604,6 +621,7 @@ class Event {
   getCmpEq() {
       switch( this.eventType ) {
         case EventType.points:
+        case EventType.snowball:
           return (a, b) => a.eqPoints(b);
         case EventType.tempo:
           return (a, b) => a.eqTempo(b);
