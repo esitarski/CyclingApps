@@ -275,12 +275,12 @@ class Enum {
 const Status = new Enum('finisher', 'dnf', 'dns', 'dsq');
 
 class SprintResult {
-  constructor( sprint, place, points, bib ) {
-	  this.sprint = sprint;
-	  this.place = place;
-	  this.points = points;
-	  this.bib = Math.abs(bib);
-  }
+	constructor( sprint, place, points, bib ) {
+		this.sprint = sprint;
+		this.place = place;
+		this.points = points;
+		this.bib = Math.abs(bib);
+	}
 }
 
 function formatNonZero( v ) {
@@ -467,7 +467,6 @@ class Action {
 
         // Assign finish order to the pulled riders in reverse pull sequence.
         // Add back riders DNF'd or DSQ'd between pulls so we get the finish sequence at the time of the pull.
-        let iEliminatedAdjust = 0;
         let pulled = e.getPulled();
         let pullSequenceLast = -1;
         let finishOrderCur = finishOrder.length;
@@ -503,17 +502,16 @@ class Action {
       default:
         break;
     }
-    
   }
 }
 
 var EventType = new Enum (
-  'points',
-  'madison',
-  'tempo',
-  'scratch',
-  'snowball'
- );
+	'points',
+	'madison',
+	'tempo',
+	'scratch',
+	'snowball'
+);
 var EventUsesPoints = new Set( [EventType.points, EventType.madison, EventType.tempo, EventType.snowball] );
 
 class Event {
@@ -599,7 +597,7 @@ class Event {
         this.doublePointsLastSprint = false;
         break;
       case EventType.snowball:
-        this.pointsForPlace = [];
+        this.pointsForPlace = [1];
         this.pointsForUpDown = 20;
         this.doublePointsLastSprint = false;
         break;
@@ -1068,7 +1066,6 @@ function handleActionChange( e, iAction ) {
 
 function fixFilename( f ) {
 	return f.replace( new RegExp('[#%&{}\\<>*? \t\n\r$!\'":@+\`|=/]+', 'g'), '_' );
-	
 }
 
 function capitalizeTitle( name ) {
