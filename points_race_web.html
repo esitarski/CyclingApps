@@ -289,78 +289,76 @@ function formatNonZero( v ) {
 
 const finishUnplaced = 32767; // Placeholder for unplaced riders.
 
-function cmpTo( a, b ) {
-	return typeof a == 'string' ? a.compareTo( b ) : a - b;
-}
-
 class Rider {
-  constructor( bib ) {
-  this.bib = bib;
+	constructor( bib ) {
+		this.bib = bib;
 
-  this.status = Status.finisher;
-  this.pointsOnSprint = new Map(); // Points awarded per sprint starting from 1.
-  this.pointsTotal = 0;
-  this.upDown = 0;
-  this.startingPoints = 0;
-  this.finishOrder = finishUnplaced;
-  this.pullSequence = 0;
-  }
-  get isPulled() { return this.pullSequence != 0; }
-  get isFinisher() { return this.status == Status.finisher; }
+		this.status = Status.finisher;
+		this.pointsOnSprint = new Map(); // Points awarded per sprint starting from 1.
+		this.pointsTotal = 0;
+		this.upDown = 0;
+		this.startingPoints = 0;
+		this.finishOrder = finishUnplaced;
+		this.pullSequence = 0;
+	}
+	get isPulled() { return this.pullSequence != 0; }
+	get isFinisher() { return this.status == Status.finisher; }
 
-  computePointsTotal( e ) {
-    if( !this.isFinisher ) {
-      this.pointsTotal = 0;
-      return;
-    }
-    this.pointsTotal = this.startingPoints;
-    for( let points of this.pointsOnSprint.values() )
-		this.pointsTotal += points;
-    this.pointsTotal += this.upDown * e.pointsForUpDown;
-  }
-  
-  get getStatusDisplay() { return Status.name(this.status).toUpperCase(); }
+	computePointsTotal( e ) {
+		if( !this.isFinisher ) {
+			this.pointsTotal = 0;
+			return;
+		}
+		this.pointsTotal = this.startingPoints;
+		for( let points of this.pointsOnSprint.values() )
+			this.pointsTotal += points;
+		this.pointsTotal += this.upDown * e.pointsForUpDown;
+	}
 
-  cmpPoints( r ) {
-    let result = 0;
-    if( (result = cmpTo( this.status, r.status )) != 0 ) 			 return result;
-    if( (result = -cmpTo( this.pointsTotal, r.pointsTotal )) != 0 )   return result;
-    if( (result = cmpTo( this.finishOrder, r.finishOrder )) != 0 )    return result;
-    return cmpTo( this.bib, r.bib );
-  }
-  eqPoints( r ) {
-    return this.status == r.status && this.pointsTotal == r.pointsTotal && this.finishOrder == r.finishOrder;
-  }
+	get getStatusDisplay() { return Status.name(this.status).toUpperCase(); }
 
-  cmpTempo( r ) { return this.cmpPoints(r); }
-  eqTempo( r ) { return this.eqPoints(r); }
+	cmpPoints( r ) {
+		return (
+			(this.status - r.status ) ||
+			-( this.pointsTotal - r.pointsTotal ) ||
+			( this.finishOrder - r.finishOrder ) ||
+			( this.bib - r.bib )
+		);
+	}
+	eqPoints( r ) {
+		return this.status === r.status && this.pointsTotal === r.pointsTotal && this.finishOrder === r.finishOrder;
+	}
 
-  cmpScratch( r ) {
-    let result = 0;
-    if( (result = cmpTo( this.status, r.status )) != 0 )  			return result;
-    if( (result = -cmpTo( this.upDown, r.upDown )) != 0 )             return result;
-    if( (result = cmpTo( this.finishOrder, r.finishOrder )) != 0 )    return result;
-    return cmpTo( this.bib, r.bib );
-  }
-  eqScratch( r ) {
-    return this.status === r.status && this.upDown === r.upDown && this.finishOrder === r.finishOrder;
-  }
+	cmpTempo( r ) { return this.cmpPoints(r); }
+	eqTempo( r ) { return this.eqPoints(r); }
+
+	cmpScratch( r ) {
+		return (
+			( this.status - r.status ) ||
+			-( this.upDown - r.upDown ) ||
+			( this.finishOrder - r.finishOrder ) ||
+			( this.bib - r.bib )
+		);
+	}
+	eqScratch( r ) {
+		return this.status === r.status && this.upDown === r.upDown && this.finishOrder === r.finishOrder;
+	}
 }
 
 const ActionType = new Enum(
-  'sprint',
-  'lapUp',
-  'lapDown',
-  'pul',
-  'dnf',
-  'dns',
-  'dsq',
+	'sprint',
+	'lapUp',
+	'lapDown',
+	'pul',
+	'dnf',
+	'dns',
+	'dsq',
 
-  'breakGroup',
-  'chaseGroup',
-  'otb',
-  'nml',
-  'cmpct'
+	'breakGroup',
+	'chaseGroup',
+	'otb',
+	'nml',
+	'cmpct'
 );
 
 const actionResult = new Set( [ActionType.sprint, ActionType.lapUp, ActionType.lapDown, ActionType.pul, ActionType.dnf, ActionType.dns, ActionType.dsq] );
