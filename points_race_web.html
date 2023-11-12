@@ -897,6 +897,7 @@ function handleDialogAction( actionType ) {
 	let bibs = document.getElementById('idBibText').value;
 	
 	if( iActionCur < 0 ) {
+		// This is a new action.
 		let a = new Action( actionType, bibs );
 		if( !(actionResult.has(actionType) && a.bibText == '') ) {
 			eventCur.actions.push( a );
@@ -906,13 +907,13 @@ function handleDialogAction( actionType ) {
 		}
 	}
 	else {
+		// This is a change to the existing action.
 		let a = eventCur.actions[iActionCur];
-		if( a.actionType == actionType ) {
+		if( a.actionType === actionType ) {
 			// The actionType is unchanged.  Change the bibs.
-			a.eventType = actionType;
 			a.setBibText( bibs );
 			refreshActions();	// Model => Screen
-			if( actionResult.has(actionType) || actionResult.has(actionTypeSave) )
+			if( actionResult.has(actionType) )
 				refreshResults();
 		}
 		else {
