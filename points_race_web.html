@@ -1023,7 +1023,7 @@ function addControlButtons( isEdit ) {
 	let div = document.getElementById( 'idControlButtons' );
 	div.innerHTML = '';
 	
-	addButton( div, 'OK', 'btn btn-success', handleDialogOK ).id = 'idDialogOK'
+	addButton( div, 'OK', 'btn btn-success', handleDialogOK ).id = 'idDialogOK';
 	if( isEdit ) {
 		createSpace( div );
 		addButton( div, 'New', 'btn btn-primary', handleDialogNew ).id = 'idDialogNew';
@@ -1153,13 +1153,13 @@ function parseCsv(data, fieldSep, newLine) {
     .replace(/\r/g, '')
     .replace(/\n+$/, '')
     .replace(fieldRe, (match, p1, p2) => {
-      return p1 + p2.replace(/\n/g, nSep).replace(/""/g, qSep).replace(/,/g, cSep)
+      return p1 + p2.replace(/\n/g, nSep).replace(/""/g, qSep).replace(/,/g, cSep);
     })
     .split(/\n/)
     .map(line => {
       return line
         .split(fieldSep)
-        .map(cell => cell.replace(nSepRe, newLine).replace(qSepRe, '"').replace(cSepRe, ','))
+        .map(cell => cell.replace(nSepRe, newLine).replace(qSepRe, '"').replace(cSepRe, ','));
     });
 }
 
@@ -1174,7 +1174,7 @@ function readImportFile( csv ) {
 		return -1;
 	}
 	
-	eventCur.startingPoints.clear()
+	eventCur.startingPoints.clear();
 
 	let grid = parseCsv( csv );
 	if( grid.length < 2 )
