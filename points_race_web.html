@@ -376,7 +376,7 @@ class Action {
   }
 
   get isActionResult() { return actionResult.has( this.actionType ); }
-  get isActionNote() { return actionNote.has( actionType ); }
+  get isActionNote() { return actionNote.has( this.actionType ); }
 
   getBibsFromText() {
     let bibs = this.bibText.replaceAll('-', ' -').split( /[^0-9-]+/ );
@@ -912,7 +912,7 @@ function handleDialogAction( actionType ) {
 			a.eventType = actionType;
 			a.setBibText( bibs );
 			refreshActions();	// Model => Screen
-			if( actionResults.has(actionType) || actionResults.has(actionTypeSave) )
+			if( actionResult.has(actionType) || actionResult.has(actionTypeSave) )
 				refreshResults();
 		}
 		else {
@@ -987,7 +987,7 @@ function fixActionName( name ) {
 }
 
 function actionTypeDisplay( actionType ) {
-	return fixActionName( ActionType.name(actionType) );g
+	return fixActionName( ActionType.name(actionType) );
 }
 	
 function addActionButtons() {
@@ -1238,7 +1238,6 @@ function readImportFile( csv ) {
 	else {
 		// This is a Start Points import file.
 		// Find the 'bib' and 'points' column.
-		let header = null;
 		let pointsRe = new RegExp( '^(Points|Points|Pnt|Pnts|Pts)$', 'i' );
 		let iBibCol = -1, iPointsCol = -1;
 		let iRow = 0;
@@ -1320,7 +1319,7 @@ function onLoad() {
 	
 	window.onbeforeunload = function() {
 		return "Leaving will lose your data.  Continue?";
-	}
+	};
 	
 	let eventTypeSelect = document.getElementById('idEventType');
 	let firstTime = true;
