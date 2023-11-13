@@ -284,7 +284,7 @@ class SprintResult {
 }
 
 function formatNonZero( v ) {
-	return v != 0 ? v.toString() : '';
+	return v !== 0 ? v.toString() : '';
 }
 
 const finishUnplaced = 32767; // Placeholder for unplaced riders.
@@ -301,8 +301,8 @@ class Rider {
 		this.finishOrder = finishUnplaced;
 		this.pullSequence = 0;
 	}
-	get isPulled() { return this.pullSequence != 0; }
-	get isFinisher() { return this.status == Status.finisher; }
+	get isPulled() { return this.pullSequence !== 0; }
+	get isFinisher() { return this.status === Status.finisher; }
 
 	computePointsTotal( e ) {
 		if( !this.isFinisher ) {
@@ -372,7 +372,7 @@ class Action {
   }
   
   cmpEq( a ) {
-	  return this.actionType == a.actionType && this.bibText == a.bibText;
+	  return this.actionType === a.actionType && this.bibText === a.bibText;
   }
 
   get isActionResult() { return actionResult.has( this.actionType ); }
@@ -383,7 +383,7 @@ class Action {
     let bibNums = [], bibsSeen = new Set();
     for( let b of bibs ) {
       let n = parseInt( b, 10 );
-      if( !Number.isNaN(n) && n != 0 && !bibsSeen.has(n) ) {
+      if( !Number.isNaN(n) && n !== 0 && !bibsSeen.has(n) ) {
         bibNums.push( n );
         bibsSeen.add( n );
       }
@@ -415,7 +415,7 @@ class Action {
 		// Insert <br> between groups.
 		let children = [];
 		for( let i = 0; i < bibNodes.length; ++i ) {
-			if( i != 0 )
+			if( i !== 0 )
 				children.push( document.createElement('br') );
 			children.push( bibNodes[i] );
 		}
@@ -427,7 +427,7 @@ class Action {
 	  let bibTextSave = this.bibText;
 	  this.bibText = bibText;
 	  this.normalizeBibs();
-	  return this.bibText != bibTextSave;
+	  return this.bibText !== bibTextSave;
   }
   
   get actionTypeDisplay() {
@@ -455,14 +455,14 @@ class Action {
         let points = e.getPointsForPlace();
         for( let i = 0, j = 0; i < points.length && i < finishOrder.length; ++i ) {
           let place = i + 1;
-          for( ; j < finishOrder.length && finishOrder[j] == place; ++j ) {
+          for( ; j < finishOrder.length && finishOrder[j] === place; ++j ) {
             bibRiders[j].pointsOnSprint.set( e.sprintCount, points[i] );
             e.sprintResults.push( new SprintResult(e.sprintCount, place, points[i], bibs[j]) );
           }
         }
 
         // If this is the final sprint, assign the finish order.
-        if( e.sprintCount == e.sprintMax )
+        if( e.sprintCount === e.sprintMax )
 			bibRiders.forEach( (rider, i) => rider.finishOrder = finishOrder[i] );
 
         // Assign finish order to the pulled riders in reverse pull sequence.
@@ -471,7 +471,7 @@ class Action {
         let pullSequenceLast = -1;
         let finishOrderCur = finishOrder.length;
         for( let rider of pulled ) {
-          if( rider.pullSequence != pullSequenceLast ) {
+          if( rider.pullSequence !== pullSequenceLast ) {
 				finishOrderCur += 1 + e.pullEliminatedCount[rider.pullSequence];
             pullSequenceLast = rider.pullSequence;
           }
@@ -594,7 +594,7 @@ class Event {
         break;
       case EventType.scratch:
         this.pointsForPlace = [];
-        this.pointsForUpDown = 0;
+        this.pointsForUpDown = 1;	// Required for counting +/- laps.
         this.doublePointsLastSprint = false;
         break;
       case EventType.snowball:
@@ -632,7 +632,7 @@ class Event {
   }
   
   setActions( actions ) {
-	  if( actions.length != this.actions.length || this.actions.some( (a, i) => !a.cmpEq( actions[i] ) ) ) {
+	  if( actions.length !== this.actions.length || this.actions.some( (a, i) => !a.cmpEq( actions[i] ) ) ) {
 		  this.actions = actions;
 		  this.processActions();
 		  return true;
@@ -643,7 +643,7 @@ class Event {
   getSprintCount( iAction ) {
 	  let sprintCount = 0;
 	  for( ; iAction >= 0; --iAction )
-	    if( this.actions[iAction].actionType == ActionType.sprint )
+	    if( this.actions[iAction].actionType === ActionType.sprint )
 	      ++sprintCount;
 	  return sprintCount;
   }
@@ -776,7 +776,7 @@ function refreshActions() {
 			button.className = 'd-print-none';
 		}
 		button.onclick = ((iAction) => ( (e) => handleActionChange(e, iAction) ))(iRow-1);
-		tr.children[1].textContent = action.actionTypeDisplay + (action.actionType == ActionType.sprint ? (++spCount).toString() : '');
+		tr.children[1].textContent = action.actionTypeDisplay + (action.actionType === ActionType.sprint ? (++spCount).toString() : '');
 		tr.children[1].className = actionResult.has(action.actionType) ? 'action-result' : 'action-note';
 		action.setBibChildren( tr.children[2] );
 	}
@@ -810,7 +810,7 @@ function refreshResults() {
 		colNames.push( 'Points' );
 	}
 	let iStartingPointsCol = -1;
-	if( e.usesPoints && e.riderRank.some( (r) => r.startingPoints != 0 ) ) {
+	if( e.usesPoints && e.riderRank.some( (r) => r.startingPoints !== 0 ) ) {
 		iStartingPointsCol = colNames.length;
 		colNames.push( 'Start Pts' );
 	}
@@ -841,8 +841,8 @@ function refreshResults() {
 		row[iBibCol] = r.bib.toString();
 		if( iPointsCol >= 0 )
 			row[iPointsCol] = formatNonZero( r.pointsTotal );
-		row[iUpDownCol] = formatNonZero( r.upDown * e.pointsForUpDown );
-		if( r.isFinisher && r.finishOrder != finishUnplaced )
+		row[iUpDownCol] = formatNonZero( r.upDown * e.pointsForUpDown ); // pointsForUpDown must be 1 for scratch.
+		if( r.isFinisher && r.finishOrder !== finishUnplaced )
 			row[iFinishCol] = (r.isPulled ? '(p)\u00A0' : '') + r.finishOrder.toString();
 		rows.push( row );
 	}
@@ -900,7 +900,7 @@ function handleDialogAction( actionType ) {
 	if( iActionCur < 0 ) {
 		// This is a new action.
 		let a = new Action( actionType, bibs );
-		if( !(actionResult.has(actionType) && a.bibText == '') ) {
+		if( !(actionResult.has(actionType) && a.bibText === '') ) {
 			eventCur.actions.push( a );
 			refreshActions();	// Model => Screen
 			if( actionResult.has(actionType) )
@@ -920,7 +920,7 @@ function handleDialogAction( actionType ) {
 		else {
 			// The actionType changed.  Create a new action with the given bibs.
 			a = new Action( actionType, bibs );
-			if( !(actionResult.has(actionType) && a.bibText == '') ) {
+			if( !(actionResult.has(actionType) && a.bibText === '') ) {
 				eventCur.actions.push( a );
 				refreshActions();	// Model => Screen
 				if( actionResult.has(actionType) )
@@ -957,7 +957,7 @@ function handleDialogDelete() {
 	document.getElementById('idActionDialog').close();
 	
 	let action = eventCur.actions[iActionCur];
-	document.getElementById('idDeleteConfirmActionName').innerHTML = action.actionTypeDisplay + (action.actionType == ActionType.sprint ? eventCur.getSprintCount(iActionCur) : '');
+	document.getElementById('idDeleteConfirmActionName').innerHTML = action.actionTypeDisplay + (action.actionType === ActionType.sprint ? eventCur.getSprintCount(iActionCur) : '');
 	document.getElementById('idDeleteConfirmBibText').innerHTML = action.bibText;
 	document.getElementById('idDeleteConfirmOK').onclick = function() {
 		eventCur.actions.splice( iActionCur, 1 );
@@ -1050,7 +1050,7 @@ function openDialog( isEdit=false ) {
 	else {
 		let action = eventCur.actions[iActionCur];
 		if( action ) {
-			document.getElementById('idActionName').textContent = action.actionTypeDisplay + (action.actionType == ActionType.sprint ? eventCur.getSprintCount(iActionCur) : '');
+			document.getElementById('idActionName').textContent = action.actionTypeDisplay + (action.actionType === ActionType.sprint ? eventCur.getSprintCount(iActionCur) : '');
 			document.getElementById('idBibText').value = action.bibText;
 		}
 		else
@@ -1194,11 +1194,11 @@ function readImportFile( csv ) {
 		// Get the event info.
 		let iRow = iInfoRow + 1;
 		for( ; iRow < grid.length && grid[iRow][0] !== '[Results]'; ++iRow ) {
-			if( grid[iRow][0] == 'Name' )
+			if( grid[iRow][0] === 'Name' )
 				document.getElementById( 'idEventName' ).value = grid[iRow][1];
-			else if( grid[iRow][0] == 'Type' )
+			else if( grid[iRow][0] === 'Type' )
 				eventCur.eventType = EventType.value(grid[iRow][1].toLowerCase()) || 0;
-			else if( grid[iRow][0] == 'Sprints' )
+			else if( grid[iRow][0] === 'Sprints' )
 				eventCur.sprintMax = parseInt( grid[iRow][1], 10 ) || 10;
 		}
 
@@ -1208,7 +1208,7 @@ function readImportFile( csv ) {
 			const iPointsCol = findCol( header, new RegExp( '^(Start Pts)$', 'i' ) );
 
 			// Add the starting points.
-			for( ++iRow; iRow < grid.length && grid[iRow][0] != '[Actions]'; ++iRow ) {
+			for( ++iRow; iRow < grid.length && grid[iRow][0] !== '[Actions]'; ++iRow ) {
 				if( iBibCol >= 0 && iPointsCol >= 0 ) {	
 					const bib = parseInt( grid[iRow][iBibCol], 10 );
 					const points = parseInt( grid[iRow][iPointsCol], 10 );
@@ -1218,7 +1218,7 @@ function readImportFile( csv ) {
 			}
 
 			// Read the Actions.
-			if( iRow < grid.length && grid[iRow][0] == '[Actions]' ) {
+			if( iRow < grid.length && grid[iRow][0] === '[Actions]' ) {
 				eventCur.actions.clear();
 				
 				// Create a map of all the action type names.
@@ -1229,7 +1229,7 @@ function readImportFile( csv ) {
 				for( ++iRow; iRow < grid.length; ++iRow ) {
 					const actionType = actionMap.get( grid[iRow][0].trim() );
 					const bibText = grid[iRow][1];
-					if( actionType != undefined )
+					if( actionType !== undefined )
 						eventCur.actions.push( new Action(actionType, bibText) );
 				}
 			}
@@ -1338,7 +1338,7 @@ function onLoad() {
 	document.getElementById('idBibText').addEventListener(
 		'keypress',
 		function( e ) {
-			if( e.key == 'Enter' ) {
+			if( e.key === 'Enter' ) {
 				e.preventDefault();
 				document.getElementById('idDialogOK').click();
 			}
