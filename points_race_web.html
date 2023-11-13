@@ -442,7 +442,7 @@ class Action {
     let bibRiders = bibs.map( (bib) => e.getRider(bib) );
 
     switch( this.actionType ) {
-      case ActionType.sprint:
+      case ActionType.sprint: {
         // Account for ties.
         let finishOrder = bibs.map( (bib, i) => i + 1 );
         for( let i = 1; i < finishOrder.length; ++i ) {
@@ -478,6 +478,7 @@ class Action {
           rider.finishOrder = finishOrderCur;
         }
         break;
+      }
       case ActionType.lapUp:
 		bibRiders.forEach( (rider) => ++rider.upDown );
         break;
