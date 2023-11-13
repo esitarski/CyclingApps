@@ -1074,8 +1074,6 @@ function capitalizeTitle( name ) {
 	return name[0].toUpperCase() + name.slice(1).toLowerCase();
 }
 
-const csvSep = '----';
-
 function csvField( value ) {
 	value = '' + value;
 	if( value.includes(',') || value.includes('"') )
