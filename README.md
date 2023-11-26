@@ -1,5 +1,5 @@
 # CyclingApps
-Cycling apps and tools of officials.  These are a new type of applications that run in the browser and read/write local .csv files.  Zero-install.
+Cycling apps and tools of officials.  Aa new class of applications that run in the browser and read/write to .csv files on your computer.  Zero-install and serverless.
 
 # Track Cycling
 
