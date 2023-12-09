@@ -71,6 +71,10 @@ td {
 	font-size: 110%;
 }
 
+#idActionDialog:modal {
+	margin-top: 10px;
+}
+
 .button3 {
 	display: inline-block;
 	outline: 0;
@@ -267,7 +271,7 @@ button.round {
 
 "use strict";
 
-const version = "PointsRaceWeb 1.1";
+const version = "PointsRaceWeb 1.2";
 
 Array.prototype.clear = function() {
    this.splice(0, Infinity);
@@ -969,7 +973,7 @@ function handleDialogDelete() {
 	document.getElementById('idActionDialog').close();
 	
 	let action = eventCur.actions[iActionCur];
-	document.getElementById('idDeleteConfirmActionName').innerHTML = action.actionTypeDisplay + (action.actionType === ActionType.sprint ? eventCur.getSprintCount(iActionCur) : '');
+	document.getElementById('idDeleteConfirmActionName').innerHTML = action.actionTypeDisplay + (action.actionType === ActionType.sprint ? eventCur.getSprintCount(iActionCur) : '') + ':';
 	document.getElementById('idDeleteConfirmBibText').innerHTML = action.bibText;
 	document.getElementById('idDeleteConfirmOK').onclick = function() {
 		eventCur.actions.splice( iActionCur, 1 );
@@ -986,6 +990,36 @@ function handleDialogDelete() {
 }
 
 function handleDialogCancel() {
+	document.getElementById('idActionDialog').close();
+}
+
+function handleDialogMoveUp() {
+	let bibs = document.getElementById('idBibText').value;
+	eventCur.actions[iActionCur].setBibText( bibs );
+	
+	if( iActionCur > 0 ) {
+		let tmp = eventCur.actions[iActionCur];
+		eventCur.actions[iActionCur] = eventCur.actions[iActionCur-1];
+		eventCur.actions[iActionCur-1] = tmp;
+	}
+	
+	refreshActions();
+	refreshResults();
+	document.getElementById('idActionDialog').close();
+}
+
+function handleDialogMoveDown() {
+	let bibs = document.getElementById('idBibText').value;
+	eventCur.actions[iActionCur].setBibText( bibs );
+	
+	if( iActionCur < eventCur.actions.length-1 ) {
+		let tmp = eventCur.actions[iActionCur];
+		eventCur.actions[iActionCur] = eventCur.actions[iActionCur+1];
+		eventCur.actions[iActionCur+1] = tmp;
+	}
+	
+	refreshActions();
+	refreshResults();
 	document.getElementById('idActionDialog').close();
 }
 
@@ -1042,6 +1076,16 @@ function addControlButtons( isEdit ) {
 		addButton( div, 'New', 'btn btn-primary', handleDialogNew ).id = 'idDialogNew';
 		createSpace( div );
 		addButton( div, 'Delete', 'btn btn-warning', handleDialogDelete ).id = 'idDialogDelete';
+		
+		createSpace( div );
+		if( iActionCur > 0 ) {
+			createSpace( div );
+			addButton( div, '▲', 'btn btn-primary', handleDialogMoveUp ).id = 'idDialogMoveUp';
+		}
+		if( iActionCur < eventCur.actions.length-1 ) {
+			createSpace( div );
+			addButton( div, '▼', 'btn btn-primary', handleDialogMoveDown ).id = 'idDialogMoveDown';
+		}
 	}
 	createSpace( div );
 	addButton( div, 'Cancel', 'btn btn-light', handleDialogCancel ).id = 'idDialogCancel';
@@ -1509,16 +1553,14 @@ function onLoad() {
 </body>
 
 <dialog id="idActionDialog">
-	<h3 id="idActionName"></h3>
-	<label for="idBibText">Bibs:</label><input type="text" id="idBibText" size="50" /><br/>
+	<span id="idActionName" style="font-weight:bold"></span> <input type="text" id="idBibText" size="80" /><br/>
 	<div id="idActionButtons"></div>
 	<div id="idControlButtons"></div>
 </dialog>
 
 <dialog id="idDeleteConfirmDialog">
 	<h4>Confirm Delete?</h4>
-	<h3 id="idDeleteConfirmActionName"></h3>
-	<span>Bibs:</span>
+	<span id="idDeleteConfirmActionName" style="font-weight:bold"></span>
 	<span id="idDeleteConfirmBibText" style="font-size:110%"></span><br/>
 	<p></p>
 	<div id="idDeleteConfirmButtons">
