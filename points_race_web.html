@@ -1485,8 +1485,9 @@ function onLoad() {
 					In our example, change the Bibs in the last Sprint to 20 30 40 60.<br/>
 					Press <strong>&#9881;</strong> next to Sp2 now, change 50 to 60 in the dialog, the press Enter or click on OK.
 				</li>
-				<li>Drag and Drop Action rows to change the order<br/>
-					In our example, press on "Sp2" Action and drag it on top of the "Sp1" Action.  The rows will exchange.<br/>
+				<li>Use <strong>▲</strong> or <strong>▼</strong> in the dialog to change the row order, or Drag and Drop rows in the Actions list.<br/>
+					In our example, open the dialog on "Sp2" and press <strong>▲</strong>.<br/>
+					If your device supports drag-and-drop press and hold on "Sp2" Action and drag it on top of the "Sp1" Action.  The rows will exchange.<br/>
 				</li>
 				<li>In the last Sprint, enter the full finish order.
 				</li>
@@ -1537,12 +1538,14 @@ function onLoad() {
 		<p>
 			<ul>
 				<li><strong>Ties:</strong> indicated by a <strong>-</strong> in front of the bib number.<br/>
-				<strong>Sprint: 10 20 -30 40</strong> means that 20 and 30 tied for second place, with 40 in forth.<br/>
-				N-way ties: <strong>Sprint: 10 -20 -30 40</strong> means that 10, 20 and 30 all tied for first place, with 40 in forth.<br/>
+				<strong>Spr: 10 20 -30 40</strong> means that 20 and 30 tied for second place, with 40 in forth.<br/>
+				N-way ties: <strong>Spr: 10 -20 -30 40</strong> means that 10, 20 and 30 all tied for first place, with 40 in forth.<br/>
 				</li>
-			</ul>
-			<ul>
-				<li><strong>Pulled riders:</strong> will be given a finish order based on the number or riders remaining on the track at the time they were pulled.<br/>
+				
+				<li><strong>Pulled riders:</strong> are given a finish order based on the number or riders remaining on the track at the time they were pulled.<br/>
+				They are also scored in the results.
+				<strong>PUL</strong> is not the same as <strong>DNF</strong>.<br/>
+				Keep this in mind in non-Omnium Scratch races where riders must finish, even if they are prevented from doing so in the final laps of the race.<br/>
 				</li>
 			</ul>
 		</p>
