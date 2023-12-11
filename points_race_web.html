@@ -1479,6 +1479,11 @@ function onLoad() {
 					<strong>Sprint, +Lap, -Lap, PUL, DNF, DNS, DSQ</strong>
 				</li>
 				<li>
+					Any non-digit character can be used to separate bib numbers.<br/>
+					On a mobile device with the "telephone number" input, use comma (,) or hash (#).<br/>
+					You may have to switch to another screen to enter a minus (-) character (more on that later).
+				</li>
+				<li>
 					For example, press <strong>⨁</strong>, set <strong>Bibs: 10 20 30 40</strong>, then click <strong>Sprint</strong> (or press OK/Enter).<br/>
 					Then, press <strong>⨁</strong>, then <strong>Bibs: 20 30 40 -50</strong>, then click <strong>Sprint</strong> (or press OK/Enter).<br/>
 					A minus in front of a bib number indicates a tie.  In this, case 40 and 50 are tied for 3th place.
@@ -1562,37 +1567,6 @@ function onLoad() {
 
 <dialog id="idActionDialog">
 	<span id="idActionName" style="font-weight:bold"></span> <input type="tel" id="idBibText" size="80" /><br/>
-	<!--
-	<div id="idKeypad" >
-		<table>
-			<tbody>
-				<tr>
-					<td><button>7</button></td>
-					<td><button>8</button></td>
-					<td><button>9</button></td>
-					<td><button>-</button></td>
-				</tr>
-				<tr>
-					<td><button>4</button></td>
-					<td><button>5</button></td>
-					<td><button>6</button></td>
-					<td><button> </button></td>
-				</tr>
-				<tr>
-					<td><button>1</button></td>
-					<td><button>2</button></td>
-					<td><button>3</button></td>
-					<td><button>Enter</button></td>
-				</tr>
-				<tr>
-					<td><button> </button></td>
-					<td><button>0</button></td>
-					<td><button>Del</button></td>
-				<tr>
-			</tbody>
-		</table>
-	</div>
-	-->
 	<div id="idActionButtons"></div>
 	<div id="idControlButtons"></div>
 </dialog>
