@@ -1381,15 +1381,11 @@ function onLoad() {
 	};
 	
 	let eventTypeSelect = document.getElementById('idEventType');
-	let firstTime = true;
-	for( let key of EventType.keys ) {
+	for( let [i, key] of EventType.keys.entries() ) {
 		let option = createChild( eventTypeSelect, 'option' );
 		option.value = EventType.value( key );
 		option.text = key[0].toUpperCase() + key.slice(1);
-		if( firstTime ) {
-			firstTime = false;
-			option.selected = true;
-		}
+		option.selected = (i===0);
 	}
 	eventTypeSelect.onchange = changeEventType;
 	
