@@ -958,10 +958,8 @@ function handleDialogOK() {
 	else {
 		// If we are editing an existing action, just change the bib text.
 		let bibs = document.getElementById('idBibText').value;
-		if( eventCur.actions[iActionCur].setBibText(bibs) || moveBySelection(eventCur.actions[iActionCur]) ) {
-			refreshActions();
-			refreshResults();
-		}
+		if( eventCur.actions[iActionCur].setBibText(bibs) || moveBySelection(eventCur.actions[iActionCur]) )
+			refreshDisplay();
 		document.getElementById('idActionDialog').close();
 	}
 }
@@ -982,8 +980,7 @@ function handleDialogDelete() {
 	document.getElementById('idDeleteConfirmOK').onclick = function() {
 		eventCur.actions.splice( iActionCur, 1 );
 		iActionCur = -1;
-		refreshActions();
-		refreshResults();
+		refreshDisplay();
 		document.getElementById('idDeleteConfirmDialog').close();
 	};
 	document.getElementById('idDeleteConfirmCancel').onclick = function() {
@@ -1399,10 +1396,10 @@ function onLoad() {
 	};
 	
 	let eventTypeSelect = document.getElementById('idEventType');
-	for( let [i, key] of EventType.keys.entries() ) {
+	for( const [i, key] of EventType.keys.entries() ) {
 		let option = createChild( eventTypeSelect, 'option' );
-		option.value = EventType.value( key );
 		option.text = key[0].toUpperCase() + key.slice(1);
+		option.value = EventType.value( key );
 		option.selected = (i===0);
 	}
 	eventTypeSelect.onchange = changeEventType;
