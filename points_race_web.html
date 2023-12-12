@@ -272,7 +272,7 @@ button.round {
 "use strict";
 
 //----------------------------------------------------------------------
-const version = "PointsRaceWeb 1.4";
+const version = "PointsRaceWeb 1.5";
 //----------------------------------------------------------------------
 
 Array.prototype.clear = function() {
@@ -900,6 +900,11 @@ function refreshResults() {
 	removeOverflowChildren( tbody, rows.length );
 }
 
+function refreshDisplay() {
+	refreshActions();
+	refreshResults();
+}
+
 function refreshAll() {
 	refreshActions();
 	refreshResults();
@@ -920,10 +925,8 @@ function handleDialogAction( actionType ) {
 		// This is a new action.
 		let a = new Action( actionType, bibs );
 		if( !(actionResult.has(actionType) && a.bibText === '') ) {
-			eventCur.actions.push( a );
-			refreshActions();	// Model => Screen
-			if( actionResult.has(actionType) )
-				refreshResults();
+			moveBySelection( a );
+			refreshDisplay();
 		}
 	}
 	else {
@@ -932,18 +935,16 @@ function handleDialogAction( actionType ) {
 		if( a.actionType === actionType ) {
 			// The actionType is unchanged.  Change the bibs.
 			a.setBibText( bibs );
-			refreshActions();	// Model => Screen
-			if( actionResult.has(actionType) )
-				refreshResults();
+			moveBySelection( a );
+			refreshDisplay();
 		}
 		else {
 			// The actionType changed.  Create a new action with the given bibs.
 			a = new Action( actionType, bibs );
+			iActionCur = -1;	// Reset the current index to ensure the new action gets added.
 			if( !(actionResult.has(actionType) && a.bibText === '') ) {
-				eventCur.actions.push( a );
-				refreshActions();	// Model => Screen
-				if( actionResult.has(actionType) )
-					refreshResults();
+				moveBySelection( a );
+				refreshDisplay();
 			}
 		}
 	}
@@ -957,7 +958,7 @@ function handleDialogOK() {
 	else {
 		// If we are editing an existing action, just change the bib text.
 		let bibs = document.getElementById('idBibText').value;
-		if( eventCur.actions[iActionCur].setBibText(bibs) ) {
+		if( eventCur.actions[iActionCur].setBibText(bibs) || moveBySelection(eventCur.actions[iActionCur]) ) {
 			refreshActions();
 			refreshResults();
 		}
@@ -980,9 +981,9 @@ function handleDialogDelete() {
 	document.getElementById('idDeleteConfirmBibText').innerHTML = action.bibText;
 	document.getElementById('idDeleteConfirmOK').onclick = function() {
 		eventCur.actions.splice( iActionCur, 1 );
+		iActionCur = -1;
 		refreshActions();
 		refreshResults();
-		iActionCur = -1;
 		document.getElementById('idDeleteConfirmDialog').close();
 	};
 	document.getElementById('idDeleteConfirmCancel').onclick = function() {
@@ -993,36 +994,6 @@ function handleDialogDelete() {
 }
 
 function handleDialogCancel() {
-	document.getElementById('idActionDialog').close();
-}
-
-function handleDialogMoveUp() {
-	let bibs = document.getElementById('idBibText').value;
-	eventCur.actions[iActionCur].setBibText( bibs );
-	
-	if( iActionCur > 0 ) {
-		let tmp = eventCur.actions[iActionCur];
-		eventCur.actions[iActionCur] = eventCur.actions[iActionCur-1];
-		eventCur.actions[iActionCur-1] = tmp;
-	}
-	
-	refreshActions();
-	refreshResults();
-	document.getElementById('idActionDialog').close();
-}
-
-function handleDialogMoveDown() {
-	let bibs = document.getElementById('idBibText').value;
-	eventCur.actions[iActionCur].setBibText( bibs );
-	
-	if( iActionCur < eventCur.actions.length-1 ) {
-		let tmp = eventCur.actions[iActionCur];
-		eventCur.actions[iActionCur] = eventCur.actions[iActionCur+1];
-		eventCur.actions[iActionCur+1] = tmp;
-	}
-	
-	refreshActions();
-	refreshResults();
 	document.getElementById('idActionDialog').close();
 }
 
@@ -1062,6 +1033,49 @@ function addActionButtons() {
 	}
 }
 
+function moveBySelection( action ) {
+	let select = document.getElementById( 'idMoveBeforeSelect' );
+	if( !select ) {
+		eventCur.actions.push( action );
+		return true;
+	}
+	const value = select.selectedIndex - 1;
+	if( iActionCur < 0 ) {
+		eventCur.actions.splice( value !== -1 ? value : eventCur.actions.length, 0, action );
+		return true;
+	}
+	else if( value !== -1 ) {
+		eventCur.actions.splice( iActionCur, 1 );
+		eventCur.actions.splice( value + (value > iActionCur ? 1 : 0), 0, action );
+		return true;
+	}
+	return false;
+}
+
+function createMoveActionSelect() {
+	let select = document.createElement( 'select' );
+	select.id = 'idMoveBeforeSelect';
+	
+	let option = createChild( select, 'option' );
+	option.text = '--Move Before--';
+	option.value = -1;
+	
+	let sprintCount = 0;
+	for( const [i,action] of eventCur.actions.entries() ) {
+		option = createChild( select, 'option' );
+		const name = action.actionTypeDisplay + (action.actionType === ActionType.sprint ? ++sprintCount : '');
+		const bibs = action.getBibsFromText();
+		option.text = name + ': ' + bibs.slice(0, 4).join(' ') + (bibs.length > 4 ? '...' : '');
+		option.value = i;
+	}
+	
+	option = createChild( select, 'option' );
+	option.text = '--End--';
+	option.value = eventCur.actions.length + 100;
+	
+	return select;
+}
+
 function addControlButtons( isEdit ) {
 	let div = document.getElementById( 'idControlButtons' );
 	div.innerHTML = '';
@@ -1072,17 +1086,13 @@ function addControlButtons( isEdit ) {
 		addButton( div, 'New', 'btn btn-primary', handleDialogNew ).id = 'idDialogNew';
 		createSpace( div );
 		addButton( div, 'Delete', 'btn btn-warning', handleDialogDelete ).id = 'idDialogDelete';
-		
-		createSpace( div );
-		if( iActionCur > 0 ) {
-			createSpace( div );
-			addButton( div, '▲', 'btn btn-primary', handleDialogMoveUp ).id = 'idDialogMoveUp';
-		}
-		if( iActionCur < eventCur.actions.length-1 ) {
-			createSpace( div );
-			addButton( div, '▼', 'btn btn-primary', handleDialogMoveDown ).id = 'idDialogMoveDown';
-		}
 	}
+	
+	if( eventCur.actions.length > 0 ) {
+		createSpace( div );
+		div.appendChild( createMoveActionSelect() );
+	}
+	
 	createSpace( div );
 	addButton( div, 'Cancel', 'btn btn-light', handleDialogCancel ).id = 'idDialogCancel';
 }
@@ -1499,9 +1509,9 @@ function onLoad() {
 					In our example, change the Bibs in the last Sprint to 20 30 40 60.<br/>
 					Press <strong>&#9881;</strong> next to Sp2 now, change 50 to 60 in the dialog, the press Enter or click on OK.
 				</li>
-				<li>Use <strong>▲</strong> or <strong>▼</strong> in the dialog to change the row order, or Drag and Drop rows in the Actions list.<br/>
-					In our example, open the dialog on "Sp2" and press <strong>▲</strong>.<br/>
-					If your device supports drag-and-drop press and hold on "Sp2" Action and drag it on top of the "Sp1" Action.  The rows will exchange.<br/>
+				<li>Use <strong>--Move Before--</strong> in the dialog to change the row order, or Drag and Drop rows in the Actions list.<br/>
+					In our example, open the dialog on "Sp2" and select the <strong>--Move Before--</strong> position, then press OK.<br/>
+					If your device supports drag-and-drop press and hold on "Sp2" row and drag it on top of the "Sp1" row.<br/>
 				</li>
 				<li>In the last Sprint, enter the full finish order.
 				</li>
