@@ -271,7 +271,9 @@ button.round {
 
 "use strict";
 
-const version = "PointsRaceWeb 1.3";
+//----------------------------------------------------------------------
+const version = "PointsRaceWeb 1.4";
+//----------------------------------------------------------------------
 
 Array.prototype.clear = function() {
    this.splice(0, Infinity);
@@ -279,13 +281,14 @@ Array.prototype.clear = function() {
 
 class Enum {
 	constructor( ...keys ) {
-		this._inverse = new Map();
 		this.keys = [...keys];
+		// Allow access to values with enum.key and enum[key].
+		this._inverse = new Map();
 		keys.forEach( (key, i) => { this._inverse.set(i, key); this[key] = i; } );
 		Object.freeze( this );
 	}
-	name( i ) { return this._inverse.get(i); }
-	value( key ) { return this[key]; }
+	name( i )		{ return this._inverse.get(i); }
+	value( key )	{ return this[key]; }
 }
 
 const Status = new Enum('finisher', 'dnf', 'dns', 'dsq');
@@ -1042,27 +1045,20 @@ function addActionButtons() {
 	let div = document.getElementById( 'idActionButtons' );
 	div.innerHTML = '';
 	
-	let firstTime = true;
 	let parent = createChild( div, 'p' );
-	for( let key of ActionType.keys ) {
-		if( actionResult.has( ActionType[key] ) ) {
-			if( !firstTime )
-				createSpace( parent );
-			let button = addButton( parent, fixActionName(key).replace('Sp','Sprint'), 'result-button', ((action) => (() => handleDialogAction(action)))(ActionType[key]) );
-			button.id = 'action_' + ActionType[key];
-			firstTime = false;
-		}
+	for( const [i,key] of ActionType.keys.filter( (k) => actionResult.has(ActionType[k]) ).entries() ) {
+		if( i != 0 )
+			createSpace( parent );
+		let button = addButton( parent, fixActionName(key).replace('Sp','Sprint'), 'result-button', ((action) => (() => handleDialogAction(action)))(ActionType[key]) );
+		button.id = 'action_' + ActionType[key];
 	}
-	firstTime = true;
+	
 	parent = createChild( div, 'p' );
-	for( let key of ActionType.keys ) {
-		if( actionNote.has( ActionType[key] ) ) {
-			if( !firstTime )
-				createSpace( parent );
-			let button = addButton( parent, fixActionName(key), 'note-button', ((action) => (() => handleDialogAction(action)))(ActionType[key]) );
-			button.id = 'action_' + ActionType[key];
-			firstTime = false;
-		}
+	for( const [i,key] of ActionType.keys.filter( (k) => actionNote.has(ActionType[k]) ).entries() ) {
+		if( i != 0 )
+			createSpace( parent );
+		let button = addButton( parent, fixActionName(key), 'note-button', ((action) => (() => handleDialogAction(action)))(ActionType[key]) );
+		button.id = 'action_' + ActionType[key];
 	}
 }
 
@@ -1138,9 +1134,13 @@ function csvField( value ) {
 	return value;
 }
 
+function getEventName() {
+	return document.getElementById('idEventName').value.trim() || 'EventName';
+}
+
 function getFileName() {
 	return fixFilename(
-		(document.getElementById('idEventName').value.trim() || 'Event' ) + '-' +
+		getEventName() + '-' +
 		capitalizeTitle(EventType.name(eventCur.eventType))
 	) + '.csv';
 }
@@ -1158,7 +1158,7 @@ function saveToCsv() {
 
 	csvContent.push( '[Info]' );
 	
-	const name = document.getElementById( 'idEventName' ).value.trim() || 'Event';
+	const name = getEventName();
 	csvContent.push( ['Name', csvField(name)].join(',') );
 	csvContent.push( ['Type', capitalizeTitle(EventType.name(eventCur.eventType))].join(',') );
 	csvContent.push( ['Sprints', eventCur.sprintMax].join(',') );
@@ -1191,6 +1191,18 @@ function saveToCsv() {
 	link.setAttribute('download', getFileName());
 	link.textContent = '';
 	link.click();
+}
+
+function saveToCsvConfirm() {
+	document.getElementById( 'idSaveConfirmEventName' ).innerHTML = getFileName();
+	document.getElementById( 'idSaveConfirmOK' ).onclick = function() {
+		saveToCsv();
+		document.getElementById( 'idSaveConfirmDialog' ).close();
+	};
+	document.getElementById( 'idSaveConfirmCancel' ).onclick = function() {
+		document.getElementById( 'idSaveConfirmDialog' ).close();
+	};
+	document.getElementById( 'idSaveConfirmDialog' ).showModal();
 }
 
 // Credit to: https://github.com/peterthoeny/parse-csv-js/blob/master/parse-csv.js
@@ -1332,18 +1344,14 @@ function importCsvFile() {
 //----------------------------------------------------------------------
 
 function refreshEventTitle() {
-	let eventName = document.getElementById('idEventName').value.trim();
-	if( !eventName )
-		eventName = "EventName";
+	const eventName = document.getElementById('idEventName').value.trim() || 'EventName';
 	let value = (
 		eventName +
 		' | Type: ' + capitalizeTitle( EventType.name(eventCur.eventType) ) +
 		' | Sprints: ' + eventCur.sprintMax
 	);
-	document.getElementById('idEventTitle').textContent = value;
-	
-	value = document.getElementById('idEventName').value.trim() + ' | ' + 'PointsRaceWeb';
-	document.getElementById('idTitle').textContent = value;
+	document.getElementById('idEventTitle').textContent = value;	
+	document.getElementById('idTitle').textContent = eventName + ' | ' + 'PointsRaceWeb';
 }
 
 function changeEventType( e ) {
@@ -1438,9 +1446,9 @@ function onLoad() {
 		<label for="idEventType">Type:</label><select id="idEventType"></select><div class="divider"/>
 		<label for="idSprintMax" id="idSprintMaxLabel">Sprints:</label><input type="number" min="1" max="50" id="idSprintMax"/>
 		<hr/>
-		<button onclick="saveToCsv();"  type="button" class="button3">Save</button><div class="divider"/>
-		<label for="idFileImport">Load</label><input type="file" accept=".csv" onchange="importCsvFile()" id="idFileImport" class="button3"/ ><div class="divider"/>
-		<button onclick="toggleHelp()" id="idHelpButton" type="button" class="button3">Show Help</button>
+		<button onclick="toggleHelp()" id="idHelpButton" type="button" class="button3">Show Help</button><div class="divider"/>
+		<button onclick="saveToCsvConfirm();"  type="button" class="button3">Save</button><div class="divider"/>
+		<label for="idFileImport">Load</label><input type="file" accept=".csv" onchange="importCsvFile()" id="idFileImport" class="button3"/ >
 	</div>
 	<hr/>
 	<div class="slide-left center">
@@ -1580,5 +1588,14 @@ function onLoad() {
 	</div>
 </dialog>
 
+<dialog id="idSaveConfirmDialog">
+	<h4>Confirm Save?</h4>
+	<span id="idSaveConfirmEventName" style="font-weight:bold"></span>
+	<p></p>
+	<div id="idSaveConfirmButtons">
+		<button id="idSaveConfirmOK" class="btn btn-success">OK</button>
+		<button id="idSaveConfirmCancel" class="btn btn-warning">Cancel</button>
+	</div>
+</dialog>
 
 </html>
