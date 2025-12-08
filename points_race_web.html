@@ -280,9 +280,7 @@ const version = "PointsRaceWeb 1.7";
 var saveRequired = false;	// If true, warn before leaving the page.
 
 const beforeUnloadHandler = (event) => {
-  event.preventDefault();	// Recommended.
-  // Included for legacy support, e.g. Chrome/Edge < 119
-  event.returnValue = true;
+  event.preventDefault();
 };
 
 function setSaveRequired( f ) {
