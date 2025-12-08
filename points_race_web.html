@@ -274,8 +274,28 @@ button.round {
 "use strict";
 
 //----------------------------------------------------------------------
-const version = "PointsRaceWeb 1.6";
+const version = "PointsRaceWeb 1.7";
 //----------------------------------------------------------------------
+
+var saveRequired = false;	// If true, warn before leaving the page.
+
+const beforeUnloadHandler = (event) => {
+  event.preventDefault();	// Recommended.
+  // Included for legacy support, e.g. Chrome/Edge < 119
+  event.returnValue = true;
+};
+
+function setSaveRequired( f ) {
+	if( saveRequired !== f ) {
+		saveRequired = f;
+		if( saveRequired ) {
+			window.addEventListener( "beforeunload", beforeUnloadHandler );
+		}
+		else {
+			window.removeEventListener( "beforeunload", beforeUnloadHandler );
+		}
+	}
+}
 
 Array.prototype.clear = function() {
    this.splice(0, Infinity);
@@ -928,6 +948,7 @@ function handleDialogAction( actionType ) {
 		let a = new Action( actionType, bibs );
 		if( !(actionResult.has(actionType) && a.bibText === '') ) {
 			moveBySelection( a );
+			setSaveRequired( true );
 			refreshDisplay();
 		}
 	}
@@ -938,6 +959,7 @@ function handleDialogAction( actionType ) {
 			// The actionType is unchanged.  Change the bibs.
 			a.setBibText( bibs );
 			moveBySelection( a );
+			setSaveRequired( true );
 			refreshDisplay();
 		}
 		else {
@@ -946,6 +968,7 @@ function handleDialogAction( actionType ) {
 			iActionCur = -1;	// Reset the current index to ensure the new action gets added.
 			if( !(actionResult.has(actionType) && a.bibText === '') ) {
 				moveBySelection( a );
+				setSaveRequired( true );
 				refreshDisplay();
 			}
 		}
@@ -960,8 +983,10 @@ function handleDialogOK() {
 	else {
 		// If we are editing an existing action, just change the bib text.
 		let bibs = document.getElementById('idBibText').value;
-		if( eventCur.actions[iActionCur].setBibText(bibs) || moveBySelection(eventCur.actions[iActionCur]) )
+		if( eventCur.actions[iActionCur].setBibText(bibs) || moveBySelection(eventCur.actions[iActionCur]) ) {
+			setSaveRequired( true );
 			refreshDisplay();
+		}
 		document.getElementById('idActionDialog').close();
 	}
 }
@@ -982,6 +1007,7 @@ function handleDialogDelete() {
 	document.getElementById('idDeleteConfirmOK').onclick = function() {
 		eventCur.actions.splice( iActionCur, 1 );
 		iActionCur = -1;
+		setSaveRequired( true );
 		refreshDisplay();
 		document.getElementById('idDeleteConfirmDialog').close();
 	};
@@ -1206,7 +1232,8 @@ function saveToCsvConfirm() {
 	document.getElementById( 'idSaveConfirmEventName' ).innerHTML = getFileName();
 	document.getElementById( 'idSaveConfirmOK' ).onclick = function() {
 		saveToCsv();
-		document.getElementById( 'idSaveConfirmDialog' ).close();
+		document.getElementById( 'idSaveConfirmDialog' ).close();	
+		setSaveRequired( false );
 	};
 	document.getElementById( 'idSaveConfirmCancel' ).onclick = function() {
 		document.getElementById( 'idSaveConfirmDialog' ).close();
@@ -1337,6 +1364,7 @@ function readImportFile( csv ) {
 	}
 	
 	refreshAll();
+	setSaveRequired( false );
 }
 
 function importCsvFile() {
@@ -1359,8 +1387,16 @@ function refreshEventTitle() {
 		' | Type: ' + capitalizeTitle( EventType.name(eventCur.eventType) ) +
 		' | Sprints: ' + eventCur.sprintMax
 	);
-	document.getElementById('idEventTitle').textContent = value;	
-	document.getElementById('idTitle').textContent = eventName + ' | ' + 'PointsRaceWeb';
+	if( document.getElementById('idEventTitle').textContent !== value ) {
+		document.getElementById('idEventTitle').textContent = value;
+		setSaveRequired( true );
+	}
+	
+	value = eventName + ' | ' + 'PointsRaceWeb';
+	if( document.getElementById('idTitle').textContent !== value ) {
+		document.getElementById('idTitle').textContent = value;
+		setSaveRequired( true );
+	}
 }
 
 function changeEventType( e ) {
@@ -1375,6 +1411,7 @@ function changeEventType( e ) {
 		document.getElementById( 'idSprintMax' ).hidden = false;
 		eventCur.sprintMax = parseInt( document.getElementById( 'idSprintMax' ).value, 10 )  || 1;
 	}
+	setSaveRequired( true );
 	refreshAll();
 }
 
@@ -1392,11 +1429,7 @@ function toggleHelp( e ) {
 }
 
 function onLoad() {
-	
-	window.onbeforeunload = function() {
-		return "Leaving will lose your data.  Continue?";
-	};
-	
+
 	let eventTypeSelect = document.getElementById('idEventType');
 	for( const [i, key] of EventType.keys.entries() ) {
 		let option = createChild( eventTypeSelect, 'option' );
@@ -1432,6 +1465,7 @@ function onLoad() {
 		}
 	);
 	
+	setSaveRequired( false );	
 	refreshAll();
 }
 
